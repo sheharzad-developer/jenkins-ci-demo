@@ -37,7 +37,33 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('jenkins-ci-demo') {
-                    sh 'docker build -t jenkins-ci-demo:v1 .'
+                    sh 'docker build -t sheharzad/jenkins-ci-demo:${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push sheharzad/jenkins-ci-demo:${BUILD_NUMBER}
+                        docker logout
+                    '''
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                dir('jenkins-ci-demo') {
+                    sh '''
+                        kubectl apply -f k8s/
+                        kubectl rollout status deployment/jenkins-ci-demo
+                    '''
                 }
             }
         }
