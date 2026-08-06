@@ -16,22 +16,29 @@ pipeline {
             }
         }
 
-        stage('Node Version') {
-            steps {
-                sh 'node --version'
-                sh 'npm --version'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                dir('jenkins-ci-demo') {
+                    sh 'pwd'
+                    sh 'ls -la'
+                    sh 'npm install'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                dir('jenkins-ci-demo') {
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('jenkins-ci-demo') {
+                    sh 'docker build -t jenkins-ci-demo:v1 .'
+                }
             }
         }
     }
