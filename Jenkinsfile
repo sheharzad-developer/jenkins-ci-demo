@@ -1,38 +1,37 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = 'jenkins-ci-demo'
-    }
-
     stages {
+
         stage('Checkout') {
             steps {
-                checkout scm
+                echo 'Source code downloaded from GitHub'
+            }
+        }
+
+        stage('Show Workspace') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+
+        stage('Node Version') {
+            steps {
+                sh 'node --version'
+                sh 'npm --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                dir('jenkins-ci-demo') {
-                    sh 'npm install'
-                }
+                sh 'npm install'
             }
         }
 
-        stage('Test') {
+        stage('Run Tests') {
             steps {
-                dir('jenkins-ci-demo') {
-                    sh 'npm test'
-                }
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                dir('jenkins-ci-demo') {
-                    sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
-                }
+                sh 'npm test'
             }
         }
     }
