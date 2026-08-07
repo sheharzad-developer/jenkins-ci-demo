@@ -82,7 +82,14 @@ pipeline {
                             --set image.repository=sheharzad/jenkins-ci-demo \
                             --set image.tag=${BUILD_NUMBER}
 
+                        kubectl set image deployment/jenkins-ci-demo \
+                        app=sheharzad/jenkins-ci-demo:${BUILD_NUMBER}
+                        
                         kubectl rollout status deployment/jenkins-ci-demo
+
+                        kubectl get pods
+
+                        kubectl get deployment jenkins-ci-demo
                     '''
                 }
             }
